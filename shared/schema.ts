@@ -1,18 +1,18 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+export const gameResults = pgTable("game_results", {
+  id: serial("id").primaryKey(),
+  mode: text("mode").notNull(), // 'pvp' or 'pvc'
+  gridSize: integer("grid_size").notNull(),
+  player1Score: integer("player1_score").notNull(),
+  player2Score: integer("player2_score").notNull(),
+  winner: text("winner"), // 'Player 1', 'Player 2', 'Computer', 'Draw'
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export const insertGameResultSchema = createInsertSchema(gameResults).omit({ id: true, createdAt: true });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export type GameResult = typeof gameResults.$inferSelect;
+export type InsertGameResult = z.infer<typeof insertGameResultSchema>;
