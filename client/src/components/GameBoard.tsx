@@ -276,13 +276,9 @@ export function GameBoard({
     const newBoxes = boxes.map(row => [...row]);
     
     // Logic to check adjacent boxes based on line placement
-    // Horizontal line at r, c affects box (r-1, c) and (r, c)
     if (dir === "h") {
       // Check box above
       if (r > 0) {
-        // Box is at r-1, c
-        // Needs top: hLines[r-1][c], bottom: THIS LINE, left: vLines[r-1][c], right: vLines[r-1][c+1]
-        // BUT wait, we haven't updated state yet in the closure. Use current state for others.
         if (hLines[r-1][c] && vLines[r-1][c] && vLines[r-1][c+1]) {
            newBoxes[r-1][c] = player;
            scored = true;
@@ -290,9 +286,7 @@ export function GameBoard({
       }
       // Check box below
       if (r < gridSize) {
-        // Box is at r, c
-        // Needs bottom: hLines[r+1][c], top: THIS LINE, left: vLines[r][c], right: vLines[r][c+1]
-        if (hLines[r+1][c] && vLines[r][c] && vLines[r][c+1]) {
+        if (hLines[r+1] && hLines[r+1][c] && vLines[r] && vLines[r][c] && vLines[r][c+1]) {
            newBoxes[r][c] = player;
            scored = true;
         }
@@ -300,18 +294,14 @@ export function GameBoard({
     } else { // Vertical line at r, c
       // Check box left
       if (c > 0) {
-        // Box is at r, c-1
-        // Needs right: THIS LINE, left: vLines[r][c-1], top: hLines[r][c-1], bottom: hLines[r+1][c-1]
-        if (vLines[r][c-1] && hLines[r][c-1] && hLines[r+1][c-1]) {
+        if (vLines[r][c-1] && hLines[r] && hLines[r][c-1] && hLines[r+1] && hLines[r+1][c-1]) {
            newBoxes[r][c-1] = player;
            scored = true;
         }
       }
       // Check box right
       if (c < gridSize) {
-        // Box is at r, c
-        // Needs left: THIS LINE, right: vLines[r][c+1], top: hLines[r][c], bottom: hLines[r+1][c]
-        if (vLines[r][c+1] && hLines[r][c] && hLines[r+1][c]) {
+        if (vLines[r] && vLines[r][c+1] && hLines[r] && hLines[r][c] && hLines[r+1] && hLines[r+1][c]) {
            newBoxes[r][c] = player;
            scored = true;
         }
@@ -370,7 +360,7 @@ export function GameBoard({
                       )} />
                       
                       {/* Horizontal Line (Right of dot) */}
-                      {c < gridSize && (
+                      {c < gridSize && hLines[r] && (
                         <div 
                           onClick={() => currentPlayer === "P1" || mode === "pvp" ? handleLineClick(r, c, "h", currentPlayer) : null}
                           className={cn(
@@ -380,7 +370,7 @@ export function GameBoard({
                         >
                           <div className={cn(
                             "w-full h-2 rounded-full transition-all duration-300",
-                            hLines[r] && hLines[r][c] 
+                            hLines[r][c] 
                               ? (hLines[r][c] === "P1" ? currentTheme.lineP1 : currentTheme.lineP2)
                               : "bg-white/10 hover:bg-white/30"
                           )} />
@@ -392,23 +382,25 @@ export function GameBoard({
                    {r < gridSize && (
                      <div className="flex h-12">
                        {/* Vertical Line (Below dot) */}
-                       <div 
-                          onClick={() => currentPlayer === "P1" || mode === "pvp" ? handleLineClick(r, c, "v", currentPlayer) : null}
-                          className={cn(
-                            "w-4 h-full -mt-1 -mb-1 z-10 cursor-pointer flex justify-center items-center transition-all duration-200",
-                            "hover:opacity-80 active:scale-95"
-                          )}
-                       >
-                          <div className={cn(
-                             "h-full w-2 rounded-full transition-all duration-300",
-                             vLines[r] && vLines[r][c]
-                               ? (vLines[r][c] === "P1" ? currentTheme.lineP1 : currentTheme.lineP2)
-                               : "bg-white/10 hover:bg-white/30"
-                          )} />
-                       </div>
+                       {vLines[r] && (
+                        <div 
+                           onClick={() => currentPlayer === "P1" || mode === "pvp" ? handleLineClick(r, c, "v", currentPlayer) : null}
+                           className={cn(
+                             "w-4 h-full -mt-1 -mb-1 z-10 cursor-pointer flex justify-center items-center transition-all duration-200",
+                             "hover:opacity-80 active:scale-95"
+                           )}
+                        >
+                           <div className={cn(
+                              "h-full w-2 rounded-full transition-all duration-300",
+                              vLines[r][c]
+                                ? (vLines[r][c] === "P1" ? currentTheme.lineP1 : currentTheme.lineP2)
+                                : "bg-white/10 hover:bg-white/30"
+                           )} />
+                        </div>
+                       )}
                        
                        {/* THE BOX ITSELF */}
-                       {c < gridSize && (
+                       {c < gridSize && boxes[r] && (
                          <div className="w-12 h-12 flex items-center justify-center">
                             <AnimatePresence>
                               {boxes[r][c] && (
