@@ -30,7 +30,7 @@ export default function Home() {
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black font-display tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50 drop-shadow-2xl">
-            NEON DOTS
+            Lord of the Squares
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -110,7 +110,7 @@ export default function Home() {
       </main>
       
       <footer className="py-6 text-center text-muted-foreground text-sm border-t border-white/5 bg-black/20 backdrop-blur-sm">
-        <p>© 2024 Neon Dots • Galactic Strategy Initiative</p>
+        <p>© 2024 Lord of the Squares • Galactic Strategy Initiative</p>
       </footer>
     </div>
   );

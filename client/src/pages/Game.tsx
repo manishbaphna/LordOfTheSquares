@@ -77,7 +77,7 @@ export default function Game() {
             </Button>
           </Link>
           <h1 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-            NEON DOTS
+            Lord of the Squares
           </h1>
         </div>
 
