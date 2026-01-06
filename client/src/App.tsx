@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router } from "wouter"; // Added Router here
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,13 +7,18 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Game from "@/pages/Game";
 
-function Router() {
+function NavigationRouter() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/game" component={Game} />
-      <Route component={NotFound} />
-    </Switch>
+    /* The 'base' prop tells the app that all routes start 
+       after /LordOfTheSquares 
+    */
+    <Router base="/LordOfTheSquares">
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/game" component={Game} />
+        <Route component={NotFound} />
+      </Switch>
+    </Router>
   );
 }
 
@@ -21,7 +26,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router />
+        <NavigationRouter />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
