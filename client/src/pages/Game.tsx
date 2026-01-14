@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Link } from "wouter";
 import { GameBoard, type Player } from "@/components/GameBoard";
 import { ThemeSelector } from "@/components/ThemeSelector";
@@ -18,21 +18,24 @@ export default function Game() {
   const [gridSize, setGridSize] = useState(4);
   const [mode, setMode] = useState<GameMode>("pvc");
   const [theme, setTheme] = useState<Theme>("deep-space");
+  const [playerNames, setPlayerNames] = useState({ p1: "P1", p2: "P2" });
   const [currentPlayer, setCurrentPlayer] = useState<Player>("P1");
   const [gameState, setGameState] = useState<"setup" | "playing" | "finished">("setup");
   const [winner, setWinner] = useState<Player | "Draw" | null>(null);
+  const [liveScores, setLiveScores] = useState({ p1: 0, p2: 0 });
   const [finalScores, setFinalScores] = useState({ p1: 0, p2: 0 });
 
   const { mutate: saveResult, isPending: isSaving } = useCreateGameResult();
   const { toast } = useToast();
 
   const startGame = () => {
+    setLiveScores({ p1: 0, p2: 0 });
     setGameState("playing");
     setCurrentPlayer("P1");
     setWinner(null);
   };
 
-  const handleGameOver = (result: Player | "Draw", s1: number, s2: number) => {
+  const handleGameOver = useCallback((result: Player | "Draw", s1: number, s2: number) => {
     setWinner(result);
     setFinalScores({ p1: s1, p2: s2 });
     setGameState("finished");
@@ -43,7 +46,9 @@ export default function Game() {
       gridSize,
       player1Score: s1,
       player2Score: s2,
-      winner: result === "Draw" ? "Draw" : result === "P1" ? "Player 1" : (mode === "pvc" ? "Computer" : "Player 2")
+      player1Name: playerNames.p1,
+      player2Name: playerNames.p2,
+      winner: result === "Draw" ? "Draw" : result === "P1" ? playerNames.p1 : (mode === "pvc" ? "Computer" : playerNames.p2)
     }, {
       onSuccess: () => {
         toast({
@@ -59,7 +64,7 @@ export default function Game() {
         });
       }
     });
-  };
+  }, [mode, gridSize, playerNames, saveResult, toast]);
 
   const resetGame = () => {
     setGameState("setup");
@@ -86,7 +91,7 @@ export default function Game() {
             <div className="hidden md:flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full border border-white/10">
               <span className="text-xs text-muted-foreground uppercase tracking-wider">Turn:</span>
               <Badge variant="outline" className={currentPlayer === "P1" ? "border-primary text-primary" : "border-blue-400 text-blue-400"}>
-                {currentPlayer === "P1" ? "Player 1" : (mode === "pvc" ? "Computer" : "Player 2")}
+                {currentPlayer === "P1" ? playerNames.p1 : (mode === "pvc" ? "Computer" : playerNames.p2)}
               </Badge>
             </div>
           )}
@@ -106,6 +111,29 @@ export default function Game() {
             </div>
 
             <div className="space-y-8">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">P1 Initials</label>
+                  <input 
+                    maxLength={2}
+                    value={playerNames.p1}
+                    onChange={(e) => setPlayerNames(prev => ({ ...prev, p1: e.target.value.toUpperCase() }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-center font-bold focus:outline-none focus:border-primary transition-colors"
+                  />
+                </div>
+                {mode === "pvp" && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">P2 Initials</label>
+                    <input 
+                      maxLength={2}
+                      value={playerNames.p2}
+                      onChange={(e) => setPlayerNames(prev => ({ ...prev, p2: e.target.value.toUpperCase() }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-center font-bold focus:outline-none focus:border-secondary transition-colors"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-4">
                 <label className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Grid Size: {gridSize}x{gridSize}</label>
                 <Slider 
@@ -162,8 +190,8 @@ export default function Game() {
           <div className="flex flex-col items-center gap-8 w-full">
              <div className="flex justify-between w-full max-w-2xl px-4">
                 <Card className="p-4 bg-emerald-900/20 border-emerald-500/30 backdrop-blur-md min-w-[120px] text-center">
-                  <div className="text-xs text-emerald-400 uppercase tracking-wider font-bold mb-1">Player 1</div>
-                  <div className="text-4xl font-mono text-emerald-400 text-glow">{finalScores.p1 || (gameState === "playing" ? "0" : "0")}</div>
+                  <div className="text-xs text-emerald-400 uppercase tracking-wider font-bold mb-1">{playerNames.p1}</div>
+                  <div className="text-4xl font-mono text-emerald-400 text-glow">{liveScores.p1}</div>
                 </Card>
 
                 <div className="flex flex-col items-center justify-center">
@@ -174,9 +202,9 @@ export default function Game() {
                 
                 <Card className="p-4 bg-blue-900/20 border-blue-500/30 backdrop-blur-md min-w-[120px] text-center">
                   <div className="text-xs text-blue-400 uppercase tracking-wider font-bold mb-1">
-                    {mode === "pvc" ? "Computer" : "Player 2"}
+                    {mode === "pvc" ? "CPU" : playerNames.p2}
                   </div>
-                  <div className="text-4xl font-mono text-blue-400 text-glow">{finalScores.p2 || (gameState === "playing" ? "0" : "0")}</div>
+                  <div className="text-4xl font-mono text-blue-400 text-glow">{liveScores.p2}</div>
                 </Card>
              </div>
 
@@ -185,9 +213,11 @@ export default function Game() {
                   gridSize={gridSize} 
                   theme={theme} 
                   mode={mode} 
+                  playerNames={playerNames}
                   currentPlayer={currentPlayer}
                   onTurnChange={setCurrentPlayer}
                   onGameOver={handleGameOver}
+                  onScoreUpdate={(s) => setLiveScores({ p1: s.P1, p2: s.P2 })}
                 />
              </div>
           </div>
@@ -203,7 +233,7 @@ export default function Game() {
                 <Trophy className="w-8 h-8" />
               </div>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-amber-500">
-                {winner === "Draw" ? "It's a Draw!" : `${winner === "P1" ? "Player 1" : (mode === "pvc" ? "Computer" : "Player 2")} Wins!`}
+                {winner === "Draw" ? "It's a Draw!" : `${winner === "P1" ? playerNames.p1 : (mode === "pvc" ? "Computer" : playerNames.p2)} Wins!`}
               </span>
             </DialogTitle>
           </DialogHeader>
@@ -211,12 +241,12 @@ export default function Game() {
           <div className="py-8">
             <div className="flex justify-center items-end gap-8 font-mono text-xl">
                <div className="flex flex-col gap-2">
-                 <span className="text-sm text-emerald-400">Player 1</span>
+                 <span className="text-sm text-emerald-400">{playerNames.p1}</span>
                  <span className="text-4xl font-bold">{finalScores.p1}</span>
                </div>
                <span className="text-muted-foreground pb-2">-</span>
                <div className="flex flex-col gap-2">
-                 <span className="text-sm text-blue-400">{mode === "pvc" ? "Bot" : "Player 2"}</span>
+                 <span className="text-sm text-blue-400">{mode === "pvc" ? "CPU" : playerNames.p2}</span>
                  <span className="text-4xl font-bold">{finalScores.p2}</span>
                </div>
             </div>

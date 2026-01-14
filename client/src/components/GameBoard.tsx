@@ -24,18 +24,22 @@ interface GameBoardProps {
   gridSize: number;
   theme: Theme;
   mode: "pvp" | "pvc";
+  playerNames: { p1: string; p2: string };
   onGameOver: (winner: Player | "Draw", p1Score: number, p2Score: number) => void;
   onTurnChange: (player: Player) => void;
   currentPlayer: Player;
+  onScoreUpdate?: (scores: { P1: number, P2: number }) => void;
 }
 
 export function GameBoard({ 
   gridSize, 
   theme, 
   mode, 
+  playerNames,
   onGameOver, 
   onTurnChange,
-  currentPlayer 
+  currentPlayer,
+  onScoreUpdate
 }: GameBoardProps) {
   // Game State
   const [hLines, setHLines] = useState<Player[][]>([]);
@@ -89,7 +93,7 @@ export function GameBoard({
     const totalBoxes = gridSize * gridSize;
     const filledBoxes = scores.P1 + scores.P2;
     
-    if (filledBoxes === totalBoxes && filledBoxes > 0 && !gameOver) {
+    if (filledBoxes === totalBoxes && totalBoxes > 0 && !gameOver) {
       setGameOver(true);
       let winner: Player | "Draw" = "Draw";
       if (scores.P1 > scores.P2) winner = "P1";
@@ -317,7 +321,11 @@ export function GameBoard({
            if (newBoxes[i][j] === player && boxes[i][j] === null) points++;
         }
       }
-      setScores(prev => ({ ...prev, [player]: prev[player] + points }));
+      setScores(prev => {
+        const newScores = { ...prev, [player]: prev[player] + points };
+        if (onScoreUpdate) onScoreUpdate(newScores);
+        return newScores;
+      });
       // Player goes again!
     } else {
       // Switch turn
@@ -412,7 +420,7 @@ export function GameBoard({
                                     boxes[r][c] === "P1" ? currentTheme.boxP1 : currentTheme.boxP2
                                   )}
                                 >
-                                  {boxes[r][c]}
+                                  {boxes[r][c] === "P1" ? playerNames.p1 : (mode === "pvc" ? "CPU" : playerNames.p2)}
                                 </motion.div>
                               )}
                             </AnimatePresence>

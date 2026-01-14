@@ -8,6 +8,8 @@ export const gameResults = pgTable("game_results", {
   gridSize: integer("grid_size").notNull(),
   player1Score: integer("player1_score").notNull(),
   player2Score: integer("player2_score").notNull(),
+  player1Name: text("player1_name").default("P1"),
+  player2Name: text("player2_name").default("P2"),
   winner: text("winner"), // 'Player 1', 'Player 2', 'Computer', 'Draw'
   createdAt: timestamp("created_at").defaultNow(),
 });
