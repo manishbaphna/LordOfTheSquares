@@ -26,7 +26,7 @@ export default function Home() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-sm font-medium text-primary">
             <Rocket className="w-4 h-4" />
-            <span>Next-Gen Dots & Boxes</span>
+            <span>Sweet & Simple Games</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black font-display tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50 drop-shadow-2xl">
@@ -113,7 +113,7 @@ export default function Home() {
       </main>
       
       <footer className="py-6 text-center text-muted-foreground text-sm border-t border-white/5 bg-black/20 backdrop-blur-sm">
-        <p>© 2024 Lord of the Squares • Galactic Strategy Initiative</p>
+        <p>© 2026 Lord of the Squares • Manish Baphna Initiative</p>
       </footer>
     </div>
   );
