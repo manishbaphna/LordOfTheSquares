@@ -4,6 +4,8 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
+  // This ensures all assets are loaded from /LordOfTheSquares/ instead of the root domain
+  base: "/LordOfTheSquares/", 
   plugins: [
     react(),
     runtimeErrorOverlay(),
