@@ -35,6 +35,9 @@ export default function Home() {
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             The classic strategy game reimagined for the space age. Connect dots, capture sectors, and dominate the grid against AI or friends.
+            Players take turns connecting two adjacent dots with a horizontal or vertical line. Completing a 1x1 square (a "Square") grants you a point and an immediate extra turn. 
+            Strategically block your opponent while capturing as many squares as possible to dominate the grid!
+
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
